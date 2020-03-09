@@ -11,6 +11,8 @@ def main():
     # Getting the list in the filePathEditor
     pathEditorList = listFilePathEditor()
 
+    
+
     # Getting the absolute path for every texture listed in the filePathEditor
     current = 0
     fileAbsoluteList = []
@@ -37,6 +39,8 @@ def main():
 
     copyTextures(newProjectPath, currentProjectPath, fileAbsoluteList)
 
+    print(pathEditorList)
+
 
 def getProject():
     currentProjectPath = cmds.workspace(query = True, rootDirectory = True)
@@ -45,9 +49,8 @@ def getProject():
     return(currentProjectPath, currentProjectName)
 
 def listFilePathEditor():
-    listFullPathEditor = (cmds.filePathEditor(query=True, listFiles=""))
-    listPathEditor = listFullPathEditor[2:(len(listFullPathEditor))]
-    return(listPathEditor)
+    listFullPathEditor = (cmds.filePathEditor(query=True, listFiles="", listDirectories=""))
+    return(listFullPathEditor)
 
 def findFile(name, path):
     for root, dirs, files in os.walk(path):
@@ -121,17 +124,15 @@ def copyTextures(newProjectPath, currentProjectPath, fileAbsoluteList):
                 raise
 
         if os.path.isfile(oldTexture + ".tex"):
-            print("Copying the texture and its .tex conversion")
+            print("Copying the texture and its .tex conversion", oldTexture)
             shutil.copy(oldTexture, newTexture)
             oldTex = str(oldTexture) + ".tex"
             newTex = str(newTexture) + ".tex"
             shutil.copy(oldTex, newTex)
         else:
-            print("Could not find a .tex, copying only the original texture")
+            print("Could not find a .tex, copying only the original texture", oldTexture)
             shutil.copy(oldTexture, newTexture)   
-
-        # Need to check if the folder containing the file exists before trying to copy it
-        #shutil.copy(oldTexture, newTexture)
+            
         current += 1
 
 if __name__ == "__main__":

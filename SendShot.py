@@ -33,6 +33,8 @@ def main():
     # Copying the maya workspace.mel and the currently opened scene in the new project
     copySceneEnv(newProjectPath, scene, currentProjectPath)
 
+    copyTextures(newProjectPath, currentProjectPath, fileAbsoluteList)
+
 
 def getProject():
     currentProjectPath = cmds.workspace(query = True, rootDirectory = True)

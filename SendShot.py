@@ -35,11 +35,15 @@ def main():
     createDefaultProject(newProjectPath)
 
     # Copying the maya workspace.mel and the currently opened scene in the new project
-    copySceneEnv(newProjectPath, scene, currentProjectPath)
+    newMayaScene = copySceneEnv(newProjectPath, scene, currentProjectPath)
 
+    # Copying the textures to the new project
     copyTextures(newProjectPath, currentProjectPath, fileAbsoluteList)
 
-    print(pathEditorList)
+    # Modifying the Maya ASCII file to replace the texture strings
+    modMayaAscii(newProjectPath, currentProjectPath, fileAbsoluteList, newMayaScene)
+
+   
 
 
 def getProject():
@@ -102,6 +106,8 @@ def copySceneEnv(newProjectPath, scene, currentProjectPath):
     newMayaScene = newProjectPath + "/" + scenePath
     shutil.copy(oldMayaScene, newMayaScene)
 
+    return(newMayaScene)
+
 def copyTextures(newProjectPath, currentProjectPath, fileAbsoluteList):
     # Copying the old.tex textures to the new project
     current = 0
@@ -132,8 +138,42 @@ def copyTextures(newProjectPath, currentProjectPath, fileAbsoluteList):
         else:
             print("Could not find a .tex, copying only the original texture", oldTexture)
             shutil.copy(oldTexture, newTexture)   
-            
+
         current += 1
+
+def modMayaAscii(newProjectPath, currentProjectPath, fileAbsoluteList, newMayaScene):
+    print("Changing the Maya ASCII file to change the texture paths detected")
+
+    # Getting all of the paths to change
+    current = 0
+    oldFiles = []
+    newFiles = []
+    for i in fileAbsoluteList:
+        relativePath = fileAbsoluteList[current]
+        relativePath = relativePath.replace(currentProjectPath, "")
+        # Getting the search name for the path to replace
+        oldFiles.append(currentProjectPath + "/" + relativePath)
+        
+        # Creating the new name for the path to replace
+        newFiles.append(newProjectPath + "//" + relativePath)
+        
+        current += 1
+    
+
+    # Searching for files in the Maya ASCII code
+    searchfile = open(newMayaScene).read()
+    
+    current = 0
+    for i in oldFiles:
+        searchfile = searchfile.replace(oldFiles[current], newFiles[current])
+        current += 1
+
+    writefile = open(newMayaScene, "w")
+    writefile.write(searchfile)
+    writefile.close()
+
+
+
 
 if __name__ == "__main__":
     main()

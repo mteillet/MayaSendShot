@@ -95,5 +95,11 @@ def copySceneEnv(newProjectPath, scene, currentProjectPath):
     newMayaScene = newProjectPath + "/" + scenePath
     shutil.copy(oldMayaScene, newMayaScene)
 
+def copyTextures(newProjectPath, currentProjectPath, fileAbsoluteList):
+    current = 0
+    for i in fileAbsoluteList:
+        print(fileAbsoluteList[current])
+        current += 1
+
 if __name__ == "__main__":
     main()

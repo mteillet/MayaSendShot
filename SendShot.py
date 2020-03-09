@@ -98,9 +98,15 @@ def copySceneEnv(newProjectPath, scene, currentProjectPath):
     shutil.copy(oldMayaScene, newMayaScene)
 
 def copyTextures(newProjectPath, currentProjectPath, fileAbsoluteList):
+    # Copying the old.tex textures to the new project
     current = 0
     for i in fileAbsoluteList:
-        print(fileAbsoluteList[current])
+        oldTexture = (fileAbsoluteList[current] + ".tex")
+        newTexture = oldTexture.replace(currentProjectPath, "")
+        newTexture = newProjectPath + "/" + newTexture
+
+        # Need to check if the folder containing the file exists before trying to copy it
+        shutil.copy(oldTexture, newTexture)
         current += 1
 
 if __name__ == "__main__":

@@ -15,8 +15,10 @@ def main():
     current = 0
     fileAbsoluteList = []
     for i in pathEditorList:
-        fileAbsoluteList.append(str(findFile(pathEditorList[current], currentProjectPath)))
-        current += 1
+        if "None" not in str(findFile(pathEditorList[current], currentProjectPath)):
+            fileAbsoluteList.append(str(findFile(pathEditorList[current], currentProjectPath)))
+            current += 1
+    print(len(fileAbsoluteList), " File has been detected and will be copied")
     print(fileAbsoluteList)
 
     # Get the currently opened scene
@@ -51,8 +53,8 @@ def findFile(name, path):
     for root, dirs, files in os.walk(path):
         if name in files:
             filePath = (os.path.join(root, name))
-    filePath = filePath.replace("\\", "/")
-    return(filePath)
+            filePath = filePath.replace("\\", "/")
+            return(filePath)
 
 def getScene():
     scene = cmds.file(q = True, sceneName = True)
@@ -101,12 +103,35 @@ def copyTextures(newProjectPath, currentProjectPath, fileAbsoluteList):
     # Copying the old.tex textures to the new project
     current = 0
     for i in fileAbsoluteList:
-        oldTexture = (fileAbsoluteList[current] + ".tex")
+        oldTexture = (fileAbsoluteList[current])
         newTexture = oldTexture.replace(currentProjectPath, "")
-        newTexture = newProjectPath + "/" + newTexture
+        newTexture = newProjectPath + "/" + newTexture 
+
+        pathList = newTexture.split("/")
+        pathList = pathList[0:(len(pathList)-1)]
+        path = "/".join(map(str, pathList)) + "/"
+
+        # Creating needed folders if they exists
+        try:
+            os.makedirs(path)
+            print("Created", path)
+        except OSError:
+            print(path, " already exists")
+            if not os.path.isdir(path):
+                raise
+
+        if os.path.isfile(oldTexture + ".tex"):
+            print("Copying the texture and its .tex conversion")
+            shutil.copy(oldTexture, newTexture)
+            oldTex = str(oldTexture) + ".tex"
+            newTex = str(newTexture) + ".tex"
+            shutil.copy(oldTex, newTex)
+        else:
+            print("Could not find a .tex, copying only the original texture")
+            shutil.copy(oldTexture, newTexture)   
 
         # Need to check if the folder containing the file exists before trying to copy it
-        shutil.copy(oldTexture, newTexture)
+        #shutil.copy(oldTexture, newTexture)
         current += 1
 
 if __name__ == "__main__":
